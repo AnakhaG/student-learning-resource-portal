@@ -1,0 +1,28 @@
+body {
+    background: linear-gradient(rgba(0, 0, 0, 0.4),
+        rgba(0, 0, 0, 0.4)),
+    url("{% static 'images/login.jpg' %}");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+.hero-section {
+    padding: 80px 0;
+    background: linear-gradient(to right, #4e73df, #224abe);
+    color: white;
+}
+
+.hero-image {
+    max-height: 400px;
+}
+
+.card {
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
