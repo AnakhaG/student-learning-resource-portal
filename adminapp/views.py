@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from studresourceapp.models import Resource
+from studresourceapp.models import Resource,ContactMessage
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 
 
+
 def admin_dashboard(request):
     resources = Resource.objects.all()
-    return render(request, 'admin/dashboard.html', {
+    return render(request, 'adminapp/dashboard.html', {
         'resources': resources
     })
 
@@ -25,7 +26,7 @@ def add_resource(request):
 
         return redirect('dashboard')
 
-    return render(request, 'admin/add_resource.html')
+    return render(request, 'adminapp/add_resource.html')
 
 
 def edit_resource(request, id):
@@ -47,7 +48,7 @@ def edit_resource(request, id):
         return redirect("dashboard")
 
     return render(request,
-                  "admin/edit_resource.html",
+                  "adminapp/edit_resource.html",
                   {"resource": resource})
 
 
@@ -77,18 +78,20 @@ def admin_register(request):
 
         if User.objects.filter(username=username).exists():
 
-            return render(request, 'admin/register.html',
+            return render(request, 'adminapp/register.html',
                           {'error': 'Username already exists'})
 
-        User.objects.create_user(
+        user = User.objects.create_user(
             username=username,
             email=email,
             password=password
         )
+        user.is_staff = True
+        user.save()
 
         return redirect('admin_login')
 
-    return render(request, 'admin/register.html')
+    return render(request, "adminapp/register.html")
 
 
 def admin_login(request):
@@ -111,10 +114,10 @@ def admin_login(request):
             return redirect('dashboard')
 
         return render(request,
-                      'admin/login.html',
+                      'adminapp/login.html',
                       {'error': 'Invalid Username or Password'})
 
-    return render(request, 'admin/login.html')
+    return render(request, "adminapp/login.html")
 
 
 def admin_logout(request):
@@ -127,17 +130,18 @@ def admin_logout(request):
 def dashboard(request):
 
     resources = Resource.objects.all()
-
-    students = User.objects.all()
+    messages = ContactMessage.objects.all().order_by('-created_at')
+    students = User.objects.filter(is_staff=False)
 
     context = {
         'resources': resources,
         'students': students,
         'resource_count': resources.count(),
         'student_count': students.count(),
+        'messages': messages,
     }
 
-    return render(request, 'admin/dashboard.html', context)
+    return render(request, 'adminapp/dashboard.html', context)
 def delete_student(request, id):
 
     student = get_object_or_404(User, id=id)
